@@ -122,11 +122,14 @@ if __name__ == '__main__':
     if args.directory:
         valid_formats = ['.mp4', '.mkv', '.avi']
         files = []
-        for filename in glob.iglob(args.directory + '**/**', recursive=True):
+        directory = os.path.abspath(args.directory)
+        for filename in glob.iglob(directory + '**/**', recursive=True):
             if os.path.splitext(filename)[1] in valid_formats:
                 if re.search('_cmp.[mp4,mkv,avi]', filename):
                     continue
-                runCompressor(filename, args.directory)
-    else:
+                runCompressor(filename, directory)
+    elif args.output:
         runCompressor(args.path, args.output)
+    else:
+        PrintStatus.error('Invalid Options.')
 
