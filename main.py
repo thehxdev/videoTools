@@ -101,7 +101,7 @@ class Video:
     def play(self):
         pass
 
-def runCompressor(vidPath:str):
+def runCompressor(vidPath:str, outPath:str):
     if args.bitrate:
         vid = Video(vidPath, args.output, args.bitrate, compressMethod='bitrate')
         try:
@@ -126,7 +126,7 @@ if __name__ == '__main__':
             if os.path.splitext(filename)[1] in valid_formats:
                 if re.search('_cmp.[mp4,mkv,avi]', filename):
                     continue
-                runCompressor(filename)
+                runCompressor(filename, args.directory)
     else:
-        runCompressor(args.path)
+        runCompressor(args.path, args.output)
 
