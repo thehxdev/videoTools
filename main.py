@@ -77,8 +77,10 @@ class Video:
                  minSize:int = 0,
                  compressMethod:str = 'bitrate',
                  ):
+
+
         self.videoPath        = videoPath
-        self.outputPath       = outputPath
+        self.outputPath       = f'{outputPath}/output'
         self.videoName        = os.path.splitext(self.videoPath)[0].split('/')[-1]
         self.videoExtention   = os.path.splitext(self.videoPath)[1]
         self.outputSuffix     = '_cmp'
@@ -87,6 +89,9 @@ class Video:
         self.bitrateOrCrf_Num = bitrateOrCrf_Num
         self.fileCurrentSize  = os.path.getsize(self.videoPath)
         self.minSize          = minSize
+
+        if os.path.exists(self.outputPath) is False:
+            os.mkdir(self.outputPath)
 
     def compress(self):
         inputVid    = ffmpeg.input(self.videoPath)
