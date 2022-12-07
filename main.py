@@ -103,13 +103,13 @@ class Video:
 
 def runCompressor(vidPath:str, outPath:str):
     if args.bitrate:
-        vid = Video(vidPath, args.output, args.bitrate, compressMethod='bitrate')
+        vid = Video(vidPath, outPath, args.bitrate, compressMethod='bitrate')
         try:
             vid.compress()
         except KeyboardInterrupt:
             sys.exit()
     elif args.crf:
-        vid = Video(vidPath, args.output, args.crf, compressMethod='crf')
+        vid = Video(vidPath, outPath, args.crf, compressMethod='crf')
         try:
             vid.compress()
         except KeyboardInterrupt:
