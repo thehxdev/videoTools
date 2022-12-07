@@ -32,7 +32,7 @@ parser.add_argument(
 parser.add_argument(
     '-c',
     '--crf',
-    help = 'Target video crf.',
+    help = 'Target video crf (0 - 50). Lower has better Quality and LESS compression.',
     type = int,
 )
 
