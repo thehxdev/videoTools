@@ -78,8 +78,8 @@ class Video:
                  compressMethod:str = 'bitrate',
                  ):
 
-
         self.videoPath        = videoPath
+        self.inputVid         = ffmpeg.input(self.videoPath)
         self.outputPath       = f'{outputPath}/output'
         self.videoName        = os.path.splitext(self.videoPath)[0].split('/')[-1]
         self.videoExtention   = os.path.splitext(self.videoPath)[1]
@@ -88,52 +88,40 @@ class Video:
         self.compressMethod   = compressMethod
         self.bitrateOrCrf_Num = bitrateOrCrf_Num
         self.fileCurrentSize  = os.path.getsize(self.videoPath)
+        self.fileSizeMB       = int(self.fileCurrentSize / (1024 ** 2))
         self.minSize          = minSize
 
         if os.path.exists(self.outputPath) is False:
             os.mkdir(self.outputPath)
 
-    def compress(self):
-        inputVid    = ffmpeg.input(self.videoPath)
-        fileSizeMB  = int(self.fileCurrentSize / (1024 ** 2))
+    def compressor(self):
+        if self.compressMethod == 'bitrate':
+            ffmpeg.output(
+                self.inputVid,
+                self.output_file,
+                **{'c:v': 'libx264', 'b:v': f'{self.bitrateOrCrf_Num}k', 'preset': 'veryfast'}
+            ).overwrite_output().run()
+        elif self.compressMethod == 'crf':
+            ffmpeg.output(
+                self.inputVid,
+                self.output_file,
+                **{'c:v': 'libx264', 'crf': self.bitrateOrCrf_Num, 'preset': 'veryfast'}
+            ).overwrite_output().run()
+
+    def doCompress(self):
         withMinSize = False
         if self.minSize > 0:
             withMinSize = True
         if withMinSize:
-            if fileSizeMB > self.minSize:
-                if self.compressMethod == 'bitrate':
-                    ffmpeg.output(
-                        inputVid,
-                        self.output_file,
-                        **{'c:v': 'libx264', 'b:v': f'{self.bitrateOrCrf_Num}k', 'preset': 'veryfast'}
-                    ).overwrite_output().run()
-                elif self.compressMethod == 'crf':
-                    ffmpeg.output(
-                        inputVid,
-                        self.output_file,
-                        **{'c:v': 'libx264', 'crf': self.bitrateOrCrf_Num, 'preset': 'veryfast'}
-                    ).overwrite_output().run()
-
+            if self.fileSizeMB > self.minSize:
+                self.compressor()
                 PrintStatus.ok('Video Compressed!')
             else:
                 PrintStatus.info(f'File {self.videoName}{self.videoExtention} is smaller than min size.')
                 PrintStatus.info('Skipping...')
         else:
-            if self.compressMethod == 'bitrate':
-                ffmpeg.output(
-                    inputVid,
-                    self.output_file,
-                    **{'c:v': 'libx264', 'b:v': f'{self.bitrateOrCrf_Num}k', 'preset': 'veryfast'}
-                ).overwrite_output().run()
-            elif self.compressMethod == 'crf':
-                ffmpeg.output(
-                    inputVid,
-                    self.output_file,
-                    **{'c:v': 'libx264', 'crf': self.bitrateOrCrf_Num, 'preset': 'veryfast'}
-                ).overwrite_output().run()
-
+            self.compressor()
             PrintStatus.ok('Video Compressed!')
-
 
     def getInfo(self):
         pass
@@ -145,13 +133,13 @@ def runCompressor(vidPath:str, outPath:str, minimum:int=0):
     if args.bitrate:
         vid = Video(vidPath, outPath, args.bitrate, compressMethod='bitrate', minSize=minimum)
         try:
-            vid.compress()
+            vid.doCompress()
         except KeyboardInterrupt:
             sys.exit()
     elif args.crf:
         vid = Video(vidPath, outPath, args.crf, compressMethod='crf', minSize=minimum)
         try:
-            vid.compress()
+            vid.doCompress()
         except KeyboardInterrupt:
             sys.exit()
 
@@ -159,10 +147,9 @@ def runCompressor(vidPath:str, outPath:str, minimum:int=0):
 if __name__ == '__main__':
     args = parser.parse_args()
 
+    valid_formats = ['.mp4', '.mkv', '.avi']
     if args.directory:
         if args.minsize:
-            valid_formats = ['.mp4', '.mkv', '.avi']
-            files = []
             directory = os.path.abspath(args.directory)
             for filename in glob.iglob(directory + '**/**', recursive=True):
                 if os.path.splitext(filename)[1] in valid_formats:
@@ -170,8 +157,6 @@ if __name__ == '__main__':
                         continue
                     runCompressor(filename, directory, args.minsize)
         else:
-            valid_formats = ['.mp4', '.mkv', '.avi']
-            files = []
             directory = os.path.abspath(args.directory)
             for filename in glob.iglob(directory + '**/**', recursive=True):
                 if os.path.splitext(filename)[1] in valid_formats:
