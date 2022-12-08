@@ -153,14 +153,14 @@ if __name__ == '__main__':
             directory = os.path.abspath(args.directory)
             for filename in glob.iglob(directory + '**/**', recursive=True):
                 if os.path.splitext(filename)[1] in valid_formats:
-                    if re.search('_cmp.[mp4,mkv,avi]', filename):
+                    if re.search('_cmp.[mp4,mkv,avi]{3}', filename):
                         continue
                     runCompressor(filename, directory, args.minsize)
         else:
             directory = os.path.abspath(args.directory)
             for filename in glob.iglob(directory + '**/**', recursive=True):
                 if os.path.splitext(filename)[1] in valid_formats:
-                    if re.search('_cmp.[mp4,mkv,avi]', filename):
+                    if re.search('_cmp.[mp4,mkv,avi]{3}', filename):
                         continue
                     runCompressor(filename, directory)
 
