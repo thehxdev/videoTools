@@ -45,7 +45,7 @@ parser.add_argument(
 parser.add_argument(
     '-m',
     '--minsize',
-    help = 'Compress videos that are larger than this limit. 0 means No limit. (In MegaByte)',
+    help = 'Compress videos that are larger than this limit. 0 means No limit. (In MegaBytes)',
     type = int
 )
 
