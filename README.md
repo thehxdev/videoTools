@@ -4,7 +4,7 @@ simple python program that uses FFMPEG to compress video files.
 ## Dependencies
 
 ```bash
-pip3 install -U ffmpeg ffmpeg-python termcolor
+pip3 install -U ffmpeg-python termcolor
 ```
 
 ## How to use
